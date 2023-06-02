@@ -1,0 +1,7 @@
+thumbs_up = 0;
+thumbs_down = 1;
+ok = 2;
+victory = 3;
+
+right = 0;
+left = 1;
