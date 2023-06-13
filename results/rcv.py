@@ -1,18 +1,21 @@
 import tensorflow
-import keras
 import numpy as np
 import json
-from PIL import Image #Python Environment lange instaliuoti ne PIL o Pillow, cia tas pats
-import io
 import socket
-import time
 
-CNN_model = tensorflow.keras.models.load_model("./results/Best_model.h5")
+model = tensorflow.keras.models.load_model("./results/model.h5")
 
 class_mapping = ['thumbs_up','thumbs_down','ok','victory']
 
-def make_a_prediction(input):
+def MakePrediction(input):
 
+    if not input.startswith("{\"rotations\":"):
+        return "bad start", 0.0
+    if not input.endswith("}]}"):
+        return "bad end", 0.0
+    if "}{" in input:
+        return "two at a time", 0.0
+        
     input_data = json.loads(input)
 
     pose = []
@@ -25,29 +28,16 @@ def make_a_prediction(input):
     pose = pose.flatten()
     pose = pose.reshape(1, 72, 1)
 
-    # newsize = (28, 28)
-    # gray_img = gray_img.resize(newsize)
+    prediction = model.predict(pose,verbose=0)
 
-    # img_array = []
-    # img_array = np.asarray(gray_img)
-    # img_array = img_array / 255.0
-    # img_array = img_array.reshape(1,28,28,1)
-
-    prediction = CNN_model.predict(pose,verbose=0)
-
-    #prediction_list = numpy.argmax(CNN_model.predict(img_array,verbose=0), axis=1)
     prediction_list = np.argmax(prediction, axis=1)
     predicted_class = class_mapping[prediction_list[0]]
-    print("Predicted class is " + predicted_class)
-
-    #prediction_array = CNN_model.predict(img_array,verbose=0)
-    #probability_percentage = prediction_array[0,prediction_list[0]]
     probability_percentage = prediction[0,prediction_list[0]]
     probability_percentage = round(probability_percentage*100, 2).astype('str')
-    print("Probability percentage is " + probability_percentage + "%")
+
+    print("Predicted class: " + predicted_class + " | Probability: " + probability_percentage + "%")
 
     return predicted_class, probability_percentage
-    # return
 
 IP = "127.0.0.1"
 PORT = 5005
@@ -64,20 +54,10 @@ while True:
     print("Accepted connection.")
 
     while True:
-        buf = connection.recv(64*64)
-        if len(buf) == 0:
+        pose_data = connection.recv(64*64)
+        if len(pose_data) == 0:
             break
-        #print(len(buf))
-        c, p = make_a_prediction(buf)
-        # timestamp = time.time_ns()
-        # with open(f"{timestamp}.png", "wb") as binary_file:
-        #     binary_file.write(buf)
-        # with open(f"{timestamp}.txt", "w", encoding="utf-8") as result:
-        #     result.write(f"{c};{p}")
+        c, p = MakePrediction(pose_data)
         connection.sendall(f"{c};{p}".encode())
         
     connection.close()
-
-# string_input = '{"rotations":[{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000},{"roll":-0.000000,"pitch":0.000000,"yaw":0.000000}]}'
-
-# make_a_prediction(string_input)
