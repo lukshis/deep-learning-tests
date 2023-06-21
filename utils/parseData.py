@@ -12,6 +12,14 @@ def ClassToNumber(class_string):
             return 2
         case "victory":
             return 3
+        case "horns":
+            return 4
+        case "phone":
+            return 5
+        case "one":
+            return 6
+        case "point":
+            return 7
     return None
 
 def HandToNumber(hand):
