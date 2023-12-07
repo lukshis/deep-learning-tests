@@ -36,9 +36,12 @@ def ReadData(path, edit='none',loc=False):
             label = ClassToNumber(data['class'])
             hand = HandToNumber(data['hand'])
             bones_rot = []
-            if loc:
-                bones_loc = []
+            #if loc:
+            #    bones_loc = []
             for bone_data in data['pose']:
+                if loc:
+                    location = [bone_data['comp']['loc']['x'], bone_data['comp']['loc']['y'], bone_data['comp']['loc']['z']]
+                    bones_rot.append(location)
                 rotation = [bone_data['comp']['rot']['roll'], bone_data['comp']['rot']['pitch'], bone_data['comp']['rot']['yaw']]
                 match edit:
                     case 'none':
@@ -48,9 +51,6 @@ def ReadData(path, edit='none',loc=False):
                     case 'stan':
                         bone = [(item / 180) for item in bone]
                 bones_rot.append(rotation)
-                if loc:
-                    location = [bone_data['comp']['loc']['x'], bone_data['comp']['loc']['y'], bone_data['comp']['loc']['z']]
-                    bones_loc.append(location)
             array = np.array(bones_rot)
             array = np.insert(array, 0, hand)
             array = np.insert(array, 0, label)
