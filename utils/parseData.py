@@ -27,7 +27,7 @@ def HandToNumber(hand):
         return 1
     return 0
 
-def ReadData(path, edit='none',loc=False):
+def ReadData(path, edit='none', loc=False, w_space=False):
     all_data = []
     for file in os.listdir(path):
         with open(os.path.join(path, file), 'r') as f:
@@ -38,9 +38,14 @@ def ReadData(path, edit='none',loc=False):
             bones_rot = []
             #if loc:
             #    bones_loc = []
+            w_loc = data['pose'][0]['world']['loc']
             for bone_data in data['pose']:
                 if loc:
-                    location = [bone_data['comp']['loc']['x'], bone_data['comp']['loc']['y'], bone_data['comp']['loc']['z']]
+                    #print(w_loc)
+                    if w_space:
+                        location = [(bone_data['world']['loc']['x'] - w_loc['x']), (bone_data['world']['loc']['y'] - w_loc['y']), (bone_data['world']['loc']['z'] - w_loc['z'])]
+                    else:
+                        location = [bone_data['comp']['loc']['x'], bone_data['comp']['loc']['y'], bone_data['comp']['loc']['z']]
                     bones_rot.append(location)
                 rotation = [bone_data['comp']['rot']['roll'], bone_data['comp']['rot']['pitch'], bone_data['comp']['rot']['yaw']]
                 match edit:
