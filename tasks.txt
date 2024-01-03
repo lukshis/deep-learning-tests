@@ -1,0 +1,2 @@
+even out left and right hand data by mirroring component space
+use hand root bone to show hand direction

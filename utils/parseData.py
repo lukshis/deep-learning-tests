@@ -44,8 +44,14 @@ def ReadData(path, edit='none', loc=False, w_space=False):
                     #print(w_loc)
                     if w_space:
                         location = [(bone_data['world']['loc']['x'] - w_loc['x']), (bone_data['world']['loc']['y'] - w_loc['y']), (bone_data['world']['loc']['z'] - w_loc['z'])]
+                        if hand == 1:
+                            location[1] = location[1] * -1
                     else:
                         location = [bone_data['comp']['loc']['x'], bone_data['comp']['loc']['y'], bone_data['comp']['loc']['z']]
+                        if hand == 1:
+                            location[0] = location[0] * -1
+                            location[1] = location[1] * -1
+                            location[2] = location[2] * -1
                     bones_rot.append(location)
                 rotation = [bone_data['comp']['rot']['roll'], bone_data['comp']['rot']['pitch'], bone_data['comp']['rot']['yaw']]
                 match edit:
