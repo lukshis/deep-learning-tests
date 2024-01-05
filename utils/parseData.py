@@ -1,6 +1,7 @@
 import json
 import os
 import numpy as np
+import random
 
 def ClassToNumber(class_string):
     match class_string:
@@ -27,7 +28,7 @@ def HandToNumber(hand):
         return 1
     return 0
 
-def ReadData(path, edit='none', loc=False, w_space=False):
+def ReadData(path="./data/", edit='none', loc=False, w_space=False):
     all_data = []
     for file in os.listdir(path):
         with open(os.path.join(path, file), 'r') as f:
@@ -68,6 +69,30 @@ def ReadData(path, edit='none', loc=False, w_space=False):
             array = array.flatten()
             all_data.append(array)
     return  np.array(all_data)
+
+def GetData(path="./data/", augment=False, loc=False, w_space=False):
+    all_data = ReadData(path, loc=loc, w_space=w_space)
+      
+    if augment:
+        all_data = AugmentData(all_data)
+    
+    labels = all_data[:, :1]
+    if loc:
+        data = all_data[:, 14:]
+    else:
+        data = all_data[:, 8:]
+    
+    return labels, data
+
+def AugmentData(data):
+    augmented_data = np.array(data)
+    for i in range(augmented_data.shape[0]):
+        for j in range(7, 72):
+            random.seed(i * j)
+            random_v = random.random()
+            augmented_data[i][j] = augmented_data[i][j] + (-1.0 + (random_v * (1.0 + 1.0)))
+    full_data = np.concatenate((data, augmented_data), axis=0)
+    return full_data
 
 def ReadLocation(path):
     location_data = []
