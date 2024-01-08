@@ -6,7 +6,7 @@ import blend_utilities as bu
 
 path = os.path.abspath("D:\Repositories\python-workspaces\deep-learning-tests\data")
 #path = "../data/"
-all_data = ReadData(path, loc=True)
+all_data = ReadData(path, loc=True, w_space=False)
 points = [[0, 1],
           [1, 2, 3, 4, 5, 19],
           [1, 6, 7, 8, 20],
@@ -51,6 +51,8 @@ def CreateVerts(data, points):
         bm.to_mesh(mesh)
         bm.free()
         c = c + 1
+    for selected in bpy.context.selected_objects:
+        selected.select_set(False)
     return
 
 CreateVerts(all_data, points)
