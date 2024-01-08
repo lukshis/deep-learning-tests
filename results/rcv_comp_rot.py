@@ -3,9 +3,10 @@ import numpy as np
 import json
 import socket
 
-model = tensorflow.keras.models.load_model("./results/model.h5")
+modelfile = "model_comp_rot.h5"
+model = tensorflow.keras.models.load_model("./results/" + modelfile)
 
-class_mapping = ['thumbs_up','thumbs_down','ok','victory']
+class_mapping = ['thumbs_up','thumbs_down','ok','victory', 'horns', 'phone', 'one', 'point']
 
 def MakePrediction(input):
 
