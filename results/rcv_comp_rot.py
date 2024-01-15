@@ -9,18 +9,18 @@ model = tensorflow.keras.models.load_model("./results/" + modelfile)
 class_mapping = ['thumbs_up','thumbs_down','ok','victory', 'horns', 'phone', 'one', 'point']
 
 def MakePrediction(input):
-
-    if not input.startswith("{\"rotations\":"):
-        return "bad start", 0.0
-    if not input.endswith("}]}"):
-        return "bad end", 0.0
-    if "}{" in input:
-        return "two at a time", 0.0
+    print("d")
+    #if not input.startswith(b"{\"rotations\":"):
+    #    return "bad start", 0.0
+    #if not input.endswith("}]}"):
+    #    return "bad end", 0.0
+    #if "}{" in input:
+    #    return "two at a time", 0.0
         
     input_data = json.loads(input)
 
     pose = []
-
+    print("e")
     for pose_data in input_data['rotations']:
         bone = [pose_data['roll'], pose_data['pitch'], pose_data['yaw']]
         pose.append(bone)
@@ -40,7 +40,7 @@ def MakePrediction(input):
 
     return predicted_class, probability_percentage
 
-IP = "127.0.0.1"
+IP = "0.0.0.0"
 PORT = 5005
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -55,10 +55,16 @@ while True:
     print("Accepted connection.")
 
     while True:
-        pose_data = connection.recv(64*64)
+        pose_data = connection.recv(8*1024)
+        print(pose_data)
+        print("a")
         if len(pose_data) == 0:
+            print("b")
             break
+        print("c")
         c, p = MakePrediction(pose_data)
-        connection.sendall(f"{c};{p}".encode())
+        print("" + c + " " + str(p))
+        #connection.sendall(f"{c};{p}".encode())
         
     connection.close()
+    print("---Connection closed---")
