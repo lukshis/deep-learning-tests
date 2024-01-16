@@ -9,13 +9,15 @@ model = tensorflow.keras.models.load_model("./results/" + modelfile)
 class_mapping = ['thumbs_up','thumbs_down','ok','victory', 'horns', 'phone', 'one', 'point']
 
 def MakePrediction(input):
-    #if not input.startswith(b"{\"rotations\":"):
-    #    return "bad start", 0.0
-    #if not input.endswith("}]}"):
-    #    return "bad end", 0.0
+    if not input.startswith(b"{\"class\":"):
+        print("bad start")
+        return 0, 0.0
+    if not input.endswith(b"}]}"):
+        print("bad end")
+        return 0, 0.0
     if b"}{" in input:
-        return "two at a time", 0.0
-        
+        print("two at a time")
+        return 0, 0.0
     input_data = json.loads(input)
     pose = []
     for pose_data in input_data['pose']:
@@ -35,9 +37,10 @@ def MakePrediction(input):
     probability_percentage = prediction[0,prediction_list[0]]
     probability_percentage = round(probability_percentage*100, 2).astype('str')
 
-    print("Predicted class: " + predicted_class + " | Probability: " + probability_percentage + "%")
-
-    return predicted_class, probability_percentage
+    #print("Predicted class: " + predicted_class + " | Probability: " + probability_percentage + "%")
+    #print("{0}, {1}".format(prediction_list[0], prediction[0,prediction_list[0]]))
+    return prediction_list[0], prediction[0,prediction_list[0]]
+    #return predicted_class, probability_percentage
 
 IP = "0.0.0.0"
 PORT = 5005
@@ -59,7 +62,7 @@ while True:
             break
         c, p = MakePrediction(pose_data)
         #print("" + c + " " + str(p))
-        #connection.sendall(f"{c};{p}".encode())
+        connection.sendall(f"{c};{p}".encode())
         
     connection.close()
     print("---Connection closed---")
