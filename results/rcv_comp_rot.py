@@ -9,25 +9,24 @@ model = tensorflow.keras.models.load_model("./results/" + modelfile)
 class_mapping = ['thumbs_up','thumbs_down','ok','victory', 'horns', 'phone', 'one', 'point']
 
 def MakePrediction(input):
-    print("d")
     #if not input.startswith(b"{\"rotations\":"):
     #    return "bad start", 0.0
     #if not input.endswith("}]}"):
     #    return "bad end", 0.0
-    #if "}{" in input:
-    #    return "two at a time", 0.0
+    if b"}{" in input:
+        return "two at a time", 0.0
         
     input_data = json.loads(input)
-
     pose = []
-    print("e")
-    for pose_data in input_data['rotations']:
-        bone = [pose_data['roll'], pose_data['pitch'], pose_data['yaw']]
+    for pose_data in input_data['pose']:
+        bone = [pose_data['comp']['rot']['roll'], pose_data['comp']['rot']['pitch'], pose_data['comp']['rot']['yaw']]
         pose.append(bone)
 
+
     pose = np.array(pose)
+    pose = pose[2:]
     pose = pose.flatten()
-    pose = pose.reshape(1, 72, 1)
+    pose = pose.reshape(1, 66, 1)
 
     prediction = model.predict(pose,verbose=0)
 
@@ -56,14 +55,10 @@ while True:
 
     while True:
         pose_data = connection.recv(8*1024)
-        print(pose_data)
-        print("a")
         if len(pose_data) == 0:
-            print("b")
             break
-        print("c")
         c, p = MakePrediction(pose_data)
-        print("" + c + " " + str(p))
+        #print("" + c + " " + str(p))
         #connection.sendall(f"{c};{p}".encode())
         
     connection.close()
