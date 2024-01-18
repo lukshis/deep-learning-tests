@@ -3,6 +3,7 @@ import os
 import numpy as np
 import random
 
+# Sets a numerical value to a pose class.
 def ClassToNumber(class_string):
     match class_string:
         case "thumbs_up":
@@ -23,11 +24,13 @@ def ClassToNumber(class_string):
             return 7
     return None
 
+# Sets a numerical value to a hand class.
 def HandToNumber(hand):
     if hand == "left":
         return 1
     return 0
 
+# Reads data from JSON files.
 def ReadData(path="./data/", edit='none', loc=False, w_space=False):
     all_data = []
     for file in os.listdir(path):
@@ -66,24 +69,31 @@ def ReadData(path="./data/", edit='none', loc=False, w_space=False):
             array = np.array(bones_rot)
             array = np.insert(array, 0, hand)
             array = np.insert(array, 0, label)
-            array = array.flatten()
+            array.flatten()
             all_data.append(array)
     return  np.array(all_data)
 
-def GetData(path="./data/", augment=False, loc=False, w_space=False):
+# Gets the data from JSON files and pre-processes it based on set parameters.
+def GetData(path="./data/", augment=False, loc=False, w_space=False, threeD=False):
+    
     all_data = ReadData(path, loc=loc, w_space=w_space)
       
     if augment:
         all_data = AugmentData(all_data)
     
-    labels = all_data[:, :1]
+    labels = all_data[:, :1] # writes labels to an array 
     if loc:
-        data = all_data[:, 14:]
+        all_data = all_data[:, 14:] # if location is written, slices the first 14 elements from the array (label, hand, first 2 bone rot and loc)
     else:
-        data = all_data[:, 8:]
+        all_data = all_data[:, 8:] # if location is NOT written, slices the first 8 elements from the array (label, hand, first 2 bone rot)
+    if threeD:
+        all_data = all_data.reshape(all_data.shape[0], 22, 3)
     
-    return labels, data
+    print(all_data)
+    print(all_data.shape)
+    return labels, all_data
 
+# Adds more data with random additions (testing proved not to be really useful).
 def AugmentData(data):
     augmented_data = np.array(data)
     for i in range(augmented_data.shape[0]):
@@ -94,6 +104,7 @@ def AugmentData(data):
     full_data = np.concatenate((data, augmented_data), axis=0)
     return full_data
 
+# Reads locations (not used, merged with ReadData function)
 def ReadLocation(path):
     location_data = []
     for file in os.listdir(path):

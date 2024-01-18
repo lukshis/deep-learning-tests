@@ -33,9 +33,9 @@ def MakePrediction(input):
     prediction = model.predict(pose,verbose=0)
 
     prediction_list = np.argmax(prediction, axis=1)
-    predicted_class = class_mapping[prediction_list[0]]
-    probability_percentage = prediction[0,prediction_list[0]]
-    probability_percentage = round(probability_percentage*100, 2).astype('str')
+    #predicted_class = class_mapping[prediction_list[0]]
+    #probability_percentage = prediction[0,prediction_list[0]]
+    #probability_percentage = round(probability_percentage*100, 2).astype('str')
 
     #print("Predicted class: " + predicted_class + " | Probability: " + probability_percentage + "%")
     #print("{0}, {1}".format(prediction_list[0], prediction[0,prediction_list[0]]))
