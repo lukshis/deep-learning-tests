@@ -2,6 +2,7 @@ import tensorflow
 import numpy as np
 import json
 import socket
+import time
 
 modelfile = "model_comp_rot.h5"
 model = tensorflow.keras.models.load_model("./results/" + modelfile)
@@ -9,6 +10,7 @@ model = tensorflow.keras.models.load_model("./results/" + modelfile)
 class_mapping = ['thumbs_up','thumbs_down','ok','victory', 'horns', 'phone', 'one', 'point']
 
 def MakePrediction(input):
+    start_time = time.time()
     if not input.startswith(b"{\"class\":"):
         print("bad start")
         return 0, 0.0
@@ -39,6 +41,7 @@ def MakePrediction(input):
 
     #print("Predicted class: " + predicted_class + " | Probability: " + probability_percentage + "%")
     #print("{0}, {1}".format(prediction_list[0], prediction[0,prediction_list[0]]))
+    print(time.time() - start_time)
     return prediction_list[0], prediction[0,prediction_list[0]]
     #return predicted_class, probability_percentage
 
