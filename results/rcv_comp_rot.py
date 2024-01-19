@@ -11,6 +11,7 @@ class_mapping = ['thumbs_up','thumbs_down','ok','victory', 'horns', 'phone', 'on
 
 def MakePrediction(input):
     start_time = time.time()
+
     if not input.startswith(b"{\"class\":"):
         print("bad start")
         return 0, 0.0
@@ -26,14 +27,15 @@ def MakePrediction(input):
         bone = [pose_data['comp']['rot']['roll'], pose_data['comp']['rot']['pitch'], pose_data['comp']['rot']['yaw']]
         pose.append(bone)
 
-
     pose = np.array(pose)
     pose = pose[2:]
     pose = pose.flatten()
     pose = pose.reshape(1, 66, 1)
+    duration = time.time() - start_time
 
+    prediction_time = time.time()
     prediction = model.predict(pose,verbose=0)
-
+    prediction_duration = time.time() - prediction_time
     prediction_list = np.argmax(prediction, axis=1)
     #predicted_class = class_mapping[prediction_list[0]]
     #probability_percentage = prediction[0,prediction_list[0]]
@@ -41,7 +43,7 @@ def MakePrediction(input):
 
     #print("Predicted class: " + predicted_class + " | Probability: " + probability_percentage + "%")
     #print("{0}, {1}".format(prediction_list[0], prediction[0,prediction_list[0]]))
-    print(time.time() - start_time)
+    print("Prediction time: {} Function time: {}".format(prediction_duration, duration))
     return prediction_list[0], prediction[0,prediction_list[0]]
     #return predicted_class, probability_percentage
 
@@ -66,6 +68,6 @@ while True:
         c, p = MakePrediction(pose_data)
         #print("" + c + " " + str(p))
         connection.sendall(f"{c};{p}".encode())
-        
+
     connection.close()
     print("---Connection closed---")
